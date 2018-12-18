@@ -48,7 +48,21 @@ def damageTake():
     t.onkeypress(damageTake,'w')
     t.listen()
     return 'Empty'
-  players['player' + str(int(damaged_Player)) + '_hp'] = players['player' + str(int(damaged_Player)) + '_hp'] - int(dmg)
+#Handling Damage when a Shield is active.
+  remaining_Dmg = 0
+  if dmg < 0:
+    dmg = int(dmg) * -1
+  if players['player' + str(int(damaged_Player)) + '_sp'] > 0:
+    players['player' + str(int(damaged_Player)) + '_sp'] = players['player' + str(int(damaged_Player)) + '_sp'] - int(dmg)
+    if players['player' + str(int(damaged_Player)) + '_sp'] < 0:
+      remaining_Dmg = players['player' + str(int(damaged_Player)) + '_sp'] 
+      players['player' + str(int(damaged_Player)) + '_sp'] = 0
+      if remaining_Dmg < 0:
+        remaining_Dmg = int(remaining_Dmg) * -1
+    players['player' + str(int(damaged_Player)) + '_hp'] = players['player' + str(int(damaged_Player)) + '_hp'] - int(remaining_Dmg)
+    #End of Shield Damage check.
+  else:
+    players['player' + str(int(damaged_Player)) + '_hp'] = players['player' + str(int(damaged_Player)) + '_hp'] - int(dmg)
   if players['player' + str(int(damaged_Player)) + '_hp'] < 0:
     players['player' + str(int(damaged_Player)) + '_hp'] = 0
   t.penup()
@@ -62,7 +76,8 @@ def shieldGive():
   shield = 25
   shielded_Player = t.numinput('Free for All!','Which player got shield', default = 3, minval = 1, maxval = amount_players)
   if shielded_Player == None:
-    t.onkeypress(ShieldGive,'q')
+    t.onkeypress(shieldGive,'q')
+    t.onkeypress(damageTake,'w')
     t.listen()
     return 'No Shield Given'
   players['player' + str(int(shielded_Player)) + '_sp'] = players['player' + str(int(shielded_Player)) + '_sp'] + shield
@@ -73,6 +88,7 @@ def shieldGive():
   t.clear()
   playerStats() 
   t.onkeypress(shieldGive,'q')
+  t.onkeypress(damageTake,'w')
   t.listen()
 
 playerStats()
